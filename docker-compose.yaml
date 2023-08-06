@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  ncr_postgre:
+    image: postgres:latest
+    container_name: pegasas_fast
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: '12345'
+      POSTGRES_DB: 'popcat'
+    ports:
+      - '5432:5432'
+    volumes:
+      - ./backup_2.sql:/docker-entrypoint-initdb.d/backup_2.sql
+      - pgdatavolume:/var/lib/postgresql/data
+
+  fastapi-app:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - ncr_postgre
+    restart: "on-failure"
+
+networks:
+  default:
+    name: bridge-test
+    external: true
+
+
+volumes:
+    pgdatavolume:
